@@ -1,0 +1,93 @@
+Name:           CraftGen
+Version:        0.0.1
+Cabal-Version:  >= 1.10
+Build-Type:     Custom
+License:        BSD3
+License-File:   LICENSE
+Author:         Tamar Christina <tamar@zhox.com>
+Maintainer:     Tamar Christina <tamar@zhox.com>
+Homepage:       https://github.com/Mistuke/CraftGen
+Category:       Development
+Stability:      experimental
+Synopsis:       Minecraft redstone circuitry generator.
+Description:    This compilers allows one to specify redstone circuitry using a simple EDSL in  Haskell and generate the ready to machinery. Either to a .schematic file or directly into your minecraft world.
+                .
+                Layouting is automatically handled by the tool and it attempts to use as few blocks as possible and hiding them under ground exposing only the inputs and output leads.
+
+Data-Files:    Templates/*.redstone
+
+Tested-With:   GHC  >= 6.12 && < 7.3
+Build-Depends: ghc         >= 6.12 && < 7.0 || >= 7.0.2,
+               base        >= 4    && < 5,
+               filepath    >= 1    && < 1.3,
+               cereal      >= 0.3.0.0,
+               zlib        == 0.5.3.1,
+               pretty      >= 1.1.0.0,
+               bytestring  >= 0.9.2.0,
+               utf8-string >= 0.3.7
+               
+Extra-Source-Files: Minecraft/*.hs,
+                    Minecraft/Format/*.hs,
+                    Minecraft/Format/NBT/*.hs,
+                    Tests/*.hs,
+                    Tests/Exec/*.hs,
+                    Tests/Src/*.hs,
+                    Tests/Src/*.dat,
+                    Tests/Src/*.schematic,
+                    Tests/Src/*.nbt,
+                    *.hs,
+                    README.md
+                    
+Library
+    Exposed:         True
+    Exposed-modules: Minecraft.ByteString, 
+                     Minecraft.PrettyPrinting, 
+                     Minecraft.Format.NBT, 
+                     Minecraft.Format.NBT.Data, 
+                     Minecraft.Format.NBT.PrettyPrinting, 
+                     Minecraft.Format.NBT.Serialize
+  
+    Build-Depends: base        >= 4   && < 5,
+                   filepath    >= 1.1.0.2,
+                   process     >= 1.0.1.1,
+                   pretty      >= 1.1.0.0,
+                   cereal      >= 0.3.0.0,
+                   bytestring  >= 0.9.2.0,
+                   utf8-string >= 0.3.7,
+                   zlib        == 0.5.3.1
+                     
+    Other-Modules:    Paths_CraftGen
+    Default-Language: Haskell98
+    
+    if !os(windows)
+        GHC-Options: -fPIC
+        
+
+Executable CraftGen
+    Main-is:          CraftGen.hs   
+    Build-Depends: base        >= 4   && < 5,
+                   filepath    >= 1.1.0.2,
+                   process     >= 1.0.1.1,
+                   pretty      >= 1.1.0.0,
+                   cereal      >= 0.3.0.0,
+                   bytestring  >= 0.9.2.0,
+                   utf8-string >= 0.3.7,
+                   zlib        == 0.5.3.1   
+    ghc-options:      -fspec-constr-count=16
+    Other-Modules:    Paths_CraftGen          
+    Default-Language: Haskell98  
+  
+Test-Suite test-parsing
+    type:             exitcode-stdio-1.0
+    main-is:          Tests/Test-Parsing.hs
+    Default-Language: Haskell98
+    build-depends: base        >= 4   && < 5,
+                   filepath    >= 1.1.0.2,
+                   process     >= 1.0.1.1,
+                   directory   >= 1.0.0.3,
+                   pretty      >= 1.1.0.0,
+                   cereal      >= 0.3.0.0,
+                   bytestring  >= 0.9.2.0,
+                   utf8-string >= 0.3.7,
+                   zlib        == 0.5.3.1,
+                   directory   >= 1.0.0.3
