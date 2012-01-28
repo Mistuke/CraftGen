@@ -38,17 +38,20 @@ instance Pretty NBT_Data where
   pp (NBT_TAG_Double     nm i) = text "TAG_Double"           <> pp nm <> text ":" <+> pp i
   pp (NBT_TAG_Byte_Array nm x) = vcat [text "TAG_Byte_Array" <> pp nm <> text ":" <+> brackets (pp (length x))
                                       ,text "{"
+                                      ,text ""
                                       ,nest 5 (ppList maxWidth x)
                                       ,text "}"
                                       ]
   pp (NBT_TAG_String     nm s) = text "TAG_String"         <> pp nm <> text ":" <+> quotes (text s)
   pp (NBT_TAG_List     nm t x) = vcat [text "TAG_List"     <> pp nm <> text ":" <+> brackets (pp (length x) <+> text "of" <+> lookupName t)
                                       ,text "{"
+                                      ,text ""
                                       ,vcat (map (nest 5 . pp) x)
                                       ,text "}"
                                       ]
   pp (NBT_TAG_Compound   nm x) = vcat [text "TAG_Compound" <> pp nm <> text ":" <+> pp (length x)           <+> text "entries"
                                       ,text "{"
+                                      ,text ""
                                       ,vcat (map (nest 5 . pp) x)
                                       ,text "}"
                                       ]
