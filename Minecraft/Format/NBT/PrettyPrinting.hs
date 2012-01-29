@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Minecraft.Format.NBT.PrettyPrinting
--- Copyright   :  (c) Tamar Christina 2011
+-- Copyright   :  (c) Tamar Christina 2012
 -- License     :  BSD3
 -- 
 -- Maintainer  :  tamar@zhox.com

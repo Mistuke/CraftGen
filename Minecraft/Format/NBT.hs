@@ -1,14 +1,14 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Minecraft.Format.NBT
--- Copyright   :  (c) Tamar Christina 2011
+-- Copyright   :  (c) Tamar Christina 2012
 -- License     :  BSD3
 -- 
 -- Maintainer  :  tamar@zhox.com
 -- Stability   :  experimental
 -- Portability :  portable
 --
--- Contains pretty printing information for the NBT Minecraft datatype
+-- Contains information for the NBT Minecraft datatype
 --
 -----------------------------------------------------------------------------
 module Minecraft.Format.NBT

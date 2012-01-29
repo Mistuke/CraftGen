@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Minecraft.Format.NBT.Serialize
--- Copyright   :  (c) Tamar Christina 2009 - 2010
+-- Copyright   :  (c) Tamar Christina 2012
 -- License     :  BSD3
 -- 
 -- Maintainer  :  tamar@zhox.com
