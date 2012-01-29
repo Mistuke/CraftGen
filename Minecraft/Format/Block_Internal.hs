@@ -1,3 +1,6 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE FlexibleInstances     #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Minecraft.Format.Block_Internal
@@ -12,11 +15,14 @@
 -- an extra constructor that should only be used by the serialization
 -- and deserialization modules. Everything else should use 
 -- Minecraft.Format.Block
---
+-- .
+-- See more at http://www.minecraftwiki.net/wiki/Data_values
 -----------------------------------------------------------------------------
 module Minecraft.Format.Block_Internal where
 
 import Data.Int
+
+import Minecraft.Utils.Convertion
 
 type Blocks        = [Block]
 type Spread        = Int8
@@ -26,43 +32,55 @@ type SugarData     = Int8
 type Wetness       = Int8
 type Growth        = Int8
 type TallGrassData = Int8
+type Powered       = Bool
+type Pressed       = Bool
+type Level         = Int8
+type Delay         = Int8
+type Opened        = Bool
 
 -- | The minecraft block format
-data Block = Air                     | DeadBush             | WoodenDoor                 | Trapdoor
-           | Stone                   | Piston PistonData    | Ladders                    | Silverfish
-           | Grass                   | PistonExt PistonData | Rails                      | StoneBricks
-           | Dirt                    | Wool Color           | CobblestoneStairs          | HugeBrownMushroom
-           | Cobblestone             | BlockMovedByPiston   | WallSign                   | HugeRedMushroom
-           | WoodenPlanks            | Dandelion            | Lever                      | IronBars
-           | Saplings SaplingData    | Rose                 | StonePressurePlate         | GlassPane
-           | Bedrock                 | BrownMushroom        | IronDoor                   | Melon
-           | Water LiquidData        | RedMushroom          | WoodenPressurePlate        | PumpkinStem
-           | StillWater LiquidData   | Gold                 | RedstoneOre                | MelonStem
-           | Lava LiquidData         | Iron                 | GlowingRedstoneOre         | Vines
-           | StillLava LiquidData    | DoubleSlabs SlabData | RedstoneTorchOff TorchData | FenceGate
-           | Sand                    | Slabs SlabData       | RedstoneTorchOn  TorchData | BrickStairs
-           | Gravel                  | Bricks               | StoneButton                | StoneBrickStairs
-           | GoldOre                 | TNT                  | Snow                       | Mycelium
-           | IronOre                 | Bookshelf            | Ice                        | LilyPad
-           | CoalOre CoalData        | Moss                 | SnowBlock                  | NetherBrick
-           | Wood WoodData           | Obsidian             | Cactus CactusData          | NetherBrickFence
-           | Leaves LeavesData       | Torch TorchData      | ClayBlock                  | NetherBrickStairs
-           | Sponge                  | Fire Spread          | SugarCane SugarData        | NetherWart
-           | Glass                   | MonsterSpawner       | Jukebox JukeboxData        | EnchantmentTable
-           | LapisLazuliOre          | WoodenStairs         | Fence                      | BrewingStand
-           | LapisLazuliBlock        | Chest                | Pumpkin                    | Cauldron
-           | Dispenser Direction     | RedstoneWire         | Netherrack                 | EndPortal
-           | Sandstone               | DiamondOre           | SoulSand                   | EndPortalFrame
-           | NoteBlock               | Diamond              | Glowstone                  | EndStone
-           | Bed BedData             | CraftingTable        | Portal                     | DragonEgg
-           | PoweredRail  RailData   | WheatSeeds           | JackOLantern        
-           | DetectorRail RailData   | Farmland Wetness     | CakeBlock            
-           | StickyPiston PistonData | Furnace              | RedstoneRepeaterOff  
-           | Cobweb                  | BurningFurnace       | RedstoneRepeaterOn   
-           | TallGrass TallGrassData | SignPost             | LockedChest         
+data Block = Air                     | DeadBush               | WoodenDoor DoorData         | Trapdoor TrapDoorData
+           | Stone                   | Piston PistonData      | Ladders Direction           | Silverfish SilverFishData
+           | Grass                   | PistonExt PistonData   | Rails RailData              | StoneBricks StoneData
+           | Dirt                    | Wool Color             | CobblestoneStairs Direction | HugeBrownMushroom MushroomData
+           | Cobblestone             | BlockMovedByPiston     | WallSign Direction          | HugeRedMushroom MushroomData
+           | WoodenPlanks            | Dandelion              | Lever LeverData             | IronBars
+           | Saplings SaplingData    | Rose                   | StonePressurePlate Pressed  | GlassPane
+           | Bedrock                 | BrownMushroom          | IronDoor DoorData           | Melon
+           | Water LiquidData        | RedMushroom            | WoodenPressurePlate Pressed | PumpkinStem Growth
+           | StillWater LiquidData   | Gold                   | RedstoneOre                 | MelonStem Growth
+           | Lava LiquidData         | Iron                   | GlowingRedstoneOre          | Vines Direction
+           | StillLava LiquidData    | DoubleSlabs SlabData   | RedstoneTorchOff TorchData  | FenceGate TrapDoorData
+           | Sand                    | Slabs SlabData         | RedstoneTorchOn  TorchData  | BrickStairs Direction
+           | Gravel                  | Bricks                 | StoneButton ButtonData      | StoneBrickStairs Direction
+           | GoldOre                 | TNT                    | Snow Level                  | Mycelium
+           | IronOre                 | Bookshelf              | Ice                         | LilyPad
+           | CoalOre CoalData        | Moss                   | SnowBlock                   | NetherBrick
+           | Wood WoodData           | Obsidian               | Cactus CactusData           | NetherBrickFence
+           | Leaves LeavesData       | Torch TorchData        | ClayBlock                   | NetherBrickStairs Direction
+           | Sponge                  | Fire Spread            | SugarCane SugarData         | NetherWart Growth
+           | Glass                   | MonsterSpawner         | Jukebox JukeboxData         | EnchantmentTable
+           | LapisLazuliOre          | WoodenStairs Direction | Fence                       | BrewingStand BrewingData
+           | LapisLazuliBlock        | Chest Direction        | Pumpkin Direction           | Cauldron CauldronData
+           | Dispenser Direction     | RedstoneWire Spread    | Netherrack                  | EndPortal
+           | Sandstone               | DiamondOre             | SoulSand                    | EndPortalFrame PortalFrameData
+           | NoteBlock               | Diamond                | Glowstone                   | EndStone
+           | Bed BedData             | CraftingTable          | Portal                      | DragonEgg
+           | PoweredRail  RailData   | WheatSeeds Growth      | JackOLantern Direction       
+           | DetectorRail RailData   | Farmland Wetness       | CakeBlock            
+           | StickyPiston PistonData | Furnace Direction      | RedstoneRepeaterOff RepeaterData    
+           | Cobweb                  | BurnFurnace Direction  | RedstoneRepeaterOn  RepeaterData
+           | TallGrass TallGrassData | SignPost SignData      | LockedChest         
            | UnknownBlock Int8            -- ^ The block Id is unknown.
            | BinaryInternal [Int8] [Int8] -- ^ For internal use only!
   deriving (Show, Eq)
+  
+-- | Todo define this convertion
+instance Convertion Block Blocks where
+  to (BinaryInternal blocks datas) = [UnknownBlock 0]
+  to _                             = error $ "Expected an Internal node, got a real block instead"
+  
+  from x                    = BinaryInternal [] []
   
 -- | Wood data values
 data WoodData = OakWood
@@ -122,10 +140,10 @@ data LiquidData = LiquidFull
   deriving (Show, Eq)
   
 -- | Direction of a block
-data Direction = FacingNorth
-               | FacingSouth
-               | FacingWest
-               | FacingEast
+data Direction = ToNorth
+               | ToSouth
+               | ToWest
+               | ToEast
   deriving (Show, Eq)
   
 -- | Beds data values
@@ -207,4 +225,123 @@ data TorchData = PointEast
                | PointSouth
                | PointNorth
                | Standing
+  deriving (Show, Eq)
+  
+-- | Sign post data values
+data SignData = PostSouth           | PostNorth 
+              | PostSouth_SouthWest | PostNorth_NorthEast
+              | PostSouthWest       | PostNorthEast 
+              | PostWest_SouthWest  | PostEast_NorthEast 
+              | PostWest            | PostEast 
+              | PostWest_NorthWest  | PostEast_SouthEast 
+              | PostNorthWest       | PostSouthEast 
+              | PostNorth_NorthWest | PostSouth_SouthEast
+  deriving (Show, Eq)
+  
+-- | Door data values
+--   . The two least significant bits are the orientation of the door,
+--   . that is, the corner in which its hinge is positioned: 
+--   . 
+--   . 0x0: northwest corner 
+--   . 0x1: northeast corner 
+--   . 0x2: southeast corner 
+--   . 0x3: southwest corner 
+--   . The two bits above are flags: 
+--   . 
+--   . 0x8: If this bit is set, this is the top half of a door (else the lower half). 
+--   . 0x4: If this bit is set, the door has swung counterclockwise around its hinge. 
+--   . For example, the bottom half of a door with its hinge on the southwest corner, 
+--   . which is swung so that it is closed when viewed from the west, will have a data
+--   .  of (3 | 4) = (3 + 4) = 7. 
+data DoorData = DoorData CornerDirection Bool Bool
+  deriving (Show, Eq)
+  
+-- | Corner direction data values, see \DoorData\
+data CornerDirection = CornerNorthWest
+                     | CornerNorthEast
+                     | CornerSouthEast
+                     | CornerSouthWest
+  deriving (Show, Eq)
+  
+-- | Levers control data values
+--   . 0x8: If this bit is set, the lever has been thrown and is providing power. 
+--   . Wall levers: 
+--   . 
+--   . 0x1: Facing east 
+--   . 0x2: Facing west 
+--   . 0x3: Facing south 
+--   . 0x4: Facing north 
+--   . Ground levers: 
+--   . 
+--   . 0x5: Lever points south when off. 
+--   . 0x6: Lever points east when off. (Note that unlike the other types of switch, 
+--   .      this version didn't power wires around the block it was sitting on. This
+--   .      bug was fixed in Beta 1.6) 
+data LeverData = WallLever Powered Direction
+               | GroundLever Powered Bool Bool
+  deriving (Show, Eq)
+  
+-- | Button data values
+data ButtonData = ButtonData Pressed Direction
+  deriving (Show, Eq)
+  
+-- | Repeater data values
+data RepeaterData = RepeaterData Direction Delay
+  deriving (Show, Eq)
+  
+-- | Door data values
+data TrapDoorData = TrapDoorData Opened Direction
+  deriving (Show, Eq)
+  
+-- | Silver fish data values
+data SilverFishData = SfStone
+                    | SfCobblestone
+                    | SfStoneBrick
+  deriving (Show, Eq)
+  
+-- | Stone brick data values
+data StoneData = NormalStone | MossyStone | CrackedStone
+  deriving (Show, Eq)
+  
+-- | Mushroom data values
+--   . Value  Description   Textures  
+--   . 0      Fleshy piece  Pores on all sides  
+--   . 1      Corner piece  Cap texture on top, west and north  
+--   . 2      Side piece    Cap texture on top and north  
+--   . 3      Corner piece  Cap texture on top, north and east  
+--   . 4      Side piece    Cap texture on top and west  
+--   . 5      Top piece     Cap texture on top  
+--   . 6      Side piece    Cap texture on top and east  
+--   . 7      Corner piece  Cap texture on top, south and west  
+--   . 8      Side piece    Cap texture on top and south  
+--   . 9      Corner piece  Cap texture on top, east and south  
+--   . 10     Stem piece    Stem texture on all four sides, pores on top and bottom 
+newtype MushroomData = MushroomData Int8
+  deriving (Show, Eq)
+  
+-- | Brewing data values
+--   . The bottom three bits are bit flags for which bottle slots actually contain bottles. 
+--   . The actual bottle contents (and the reagent at the top) are stored in a TileEntity for 
+--   . this block, not in the data field. 
+--   . 
+--   . 0x1: The slot pointing east 
+--   . 0x2: The slot pointing southwest 
+--   . 0x4: The slot pointing northwest 
+data BrewingData = BrewingData Bool Bool Bool
+  deriving (Show, Eq)
+  
+-- | Cauldron data values
+data CauldronData = CauldronEmpty
+                  | CauldronThird
+                  | CauldronHalf
+                  | CauldronFull
+  deriving (Show, Eq)
+  
+-- | Portal frame data values
+--   . The bottom two bits determine which "side" of 
+--   . the whole portal frame this block is a part of. 
+--   . 
+--   . 0x4 is a bit flag: 0 is an "empty" frame block, 1 
+--   . is a block with an Eye of Ender inserted. 
+data PortalFrameData = PortalFrameData Direction Bool
   deriving (Show, Eq)

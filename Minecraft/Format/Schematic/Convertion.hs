@@ -17,6 +17,7 @@
 module Minecraft.Format.Schematic.Convertion() where
 
 import Minecraft.PrettyPrinting
+import Minecraft.Format.Block_Internal
 import Minecraft.Format.NBT
 import Minecraft.Format.Schematic.Data
 import Minecraft.Utils.Convertion
@@ -39,17 +40,24 @@ toSchematic x = error $ "Expected TAG_Compound instead got" ++ take 20 (show x)
   
 -- | Create a schematic from a list of NBT_Data
 createSchematic :: [NBT] -> Schematic
-createSchematic = foldl' create mempty
+createSchematic = toExternal . foldl' create mempty
   where create :: Schematic -> NBT -> Schematic
         create schem nbt | "Width"        === nbt = schem { scmWidth        = nbtShort nbt }
         create schem nbt | "Length"       === nbt = schem { scmLength       = nbtShort nbt }
         create schem nbt | "Height"       === nbt = schem { scmHeight       = nbtShort nbt }
         create schem nbt | "Materials"    === nbt = schem { scmMaterial     = mkMaterial (nbtString nbt) }
-        create schem nbt | "Blocks"       === nbt = schem { scmBlocks       = [] }
-        create schem nbt | "Data"         === nbt = schem { scmData         = [] }
+        create schem nbt | "Blocks"       === nbt = schem { scmBlocks       = (BinaryInternal (nbtBArr nbt) []) : scmBlocks schem }
+        create schem nbt | "Data"         === nbt = schem { scmBlocks       = (BinaryInternal [] (nbtBArr nbt)): scmBlocks schem }
         create schem nbt | "Entities"     === nbt = schem { scmEntities     = [] }
         create schem nbt | "TileEntities" === nbt = schem { scmTileEntities = [] }
         create schem _                            = schem
+        
+        toExternal :: Schematic -> Schematic
+        toExternal schem = let [a,b] = scmBlocks schem
+                               (BinaryInternal a1 b1) = a
+                               (BinaryInternal a2 b2) = b
+                               res = BinaryInternal(a1++a2) (b1++b2)
+                           in schem { scmBlocks = (to res) }
 
 -- | Convert a schematic to a NBT format
 fromSchematic :: Schematic -> NBT

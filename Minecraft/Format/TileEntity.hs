@@ -16,6 +16,8 @@
 -----------------------------------------------------------------------------
 module Minecraft.Format.TileEntity where
 
+type TileEntities = [TileEntity]
+
 -- | Known TileEntity ids: Furnace, Sign, MobSpawner, Chest, Music, Trap,
 --   RecordPlayer, Piston, Cauldron, EnchantTable, and End portal 
 data TileEntity

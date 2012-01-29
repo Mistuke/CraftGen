@@ -27,6 +27,7 @@ import Data.Int
 import Data.Monoid
 
 import Minecraft.Utils.CaseInSensitive
+import Minecraft.Format.Block
 import Minecraft.Format.Entity
 import Minecraft.Format.TileEntity
 
@@ -60,24 +61,23 @@ data Schematic
                                                 --   . exported from Minecraft Classic levels, 
                                                 --   . and "Alpha" for those from Minecraft Alpha,
                                                 --   . Minecraft Beta and Minecraft worlds.
-              , scmBlocks       :: [Int8]       -- ^ Block IDs defining the terrain. 8 bits per block.
-              , scmData         :: [Int8]       -- ^ Block data additionally defining parts of the terrain.
+              , scmBlocks       :: Blocks       -- ^ Block IDs defining the terrain. 8 bits per block.
+                                                --   . Block data additionally defining parts of the terrain.
                                                 --   . Only the lower 4 bits of each byte are used.
-              , scmEntities     :: [Entity]     -- ^ Each TAG_Compound in this list defines an entity in the
+              , scmEntities     :: Entities     -- ^ Each TAG_Compound in this list defines an entity in the
                                                 --   . schematic. See the Entity Format for Alpha levels. 
-              , scmTileEntities :: [TileEntity] -- ^ Each TAG_Compound in this list defines a tile entity in 
+              , scmTileEntities :: TileEntities -- ^ Each TAG_Compound in this list defines a tile entity in 
                                                 --   . the schematic. See Tile Entity Format. 
               }
   deriving (Eq, Show)
   
 instance Monoid Schematic where
-    mempty        = Schematic 0 0 0 mempty [] [] [] []
+    mempty        = Schematic 0 0 0 mempty [] [] []
     a `mappend` b = Schematic { scmWidth        = scmWidth        a +  scmWidth        b
                               , scmLength       = scmLength       a +  scmLength       b
                               , scmHeight       = scmHeight       a +  scmHeight       b
                               , scmMaterial     = scmMaterial a `mappend` scmMaterial  b
                               , scmBlocks       = scmBlocks       a ++ scmBlocks       b
-                              , scmData         = scmData         a ++ scmData         b
                               , scmEntities     = scmEntities     a ++ scmEntities     b
                               , scmTileEntities = scmTileEntities a ++ scmTileEntities b
                               }

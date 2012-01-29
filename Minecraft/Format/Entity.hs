@@ -16,6 +16,8 @@
 -----------------------------------------------------------------------------
 module Minecraft.Format.Entity where
 
+type Entities = [Entity]
+
 -- | Every entity is an unnamed TAG_Compound contained 
 --   in the Entities list of a chunk file. The sole exception 
 --   is the Player entity, stored in level.dat.
