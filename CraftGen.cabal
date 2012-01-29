@@ -29,6 +29,8 @@ Build-Depends: ghc         >= 6.12 && < 7.0 || >= 7.0.2,
 Extra-Source-Files: Minecraft/*.hs,
                     Minecraft/Format/*.hs,
                     Minecraft/Format/NBT/*.hs,
+                    Minecraft/Format/Schematic/*.hs,
+                    Minecraft/Utils/*.hs,
                     Tests/*.hs,
                     Tests/Exec/*.hs,
                     Tests/Src/*.hs,
@@ -40,12 +42,22 @@ Extra-Source-Files: Minecraft/*.hs,
                     
 Library
     Exposed:         True
-    Exposed-modules: Minecraft.ByteString, 
-                     Minecraft.PrettyPrinting, 
-                     Minecraft.Format.NBT, 
-                     Minecraft.Format.NBT.Data, 
-                     Minecraft.Format.NBT.PrettyPrinting, 
-                     Minecraft.Format.NBT.Serialize
+    Exposed-modules: Minecraft.ByteString,
+                     Minecraft.PrettyPrinting,
+                     Minecraft.Format.Block,
+                     Minecraft.Format.Entity,
+                     Minecraft.Format.NBT,
+                     Minecraft.Format.Schematic,
+                     Minecraft.Format.TileEntity,
+                     Minecraft.Format.NBT.Data,
+                     Minecraft.Format.NBT.PrettyPrinting,
+                     Minecraft.Format.NBT.Serialize,
+                     Minecraft.Format.Schematic.Convertion,
+                     Minecraft.Format.Schematic.Data,
+                     Minecraft.Format.Schematic.PrettyPrinting,
+                     Minecraft.Format.Schematic.Serialize,
+                     Minecraft.Utils.CaseInSensitive,
+                     Minecraft.Utils.Convertion
   
     Build-Depends: base        >= 4   && < 5,
                    filepath    >= 1.1.0.2,
@@ -56,7 +68,8 @@ Library
                    utf8-string >= 0.3.6,
                    zlib        == 0.5.3.1
                      
-    Other-Modules:    Paths_CraftGen
+    Other-Modules:    Paths_CraftGen,
+                      Minecraft.Format.Block_Internal
     Default-Language: Haskell98
     
     if !os(windows)

@@ -1,0 +1,14 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Minecraft.Format.TileEntity
+-- Copyright   :  (c) Tamar Christina 2012
+-- License     :  BSD3
+-- 
+-- Maintainer  :  tamar@zhox.com
+-- Stability   :  experimental
+-- Portability :  portable
+--
+-- Serialization information for the Schematic datatype defifinition
+--
+-----------------------------------------------------------------------------
+module Minecraft.Format.Schematic.Serialize where
