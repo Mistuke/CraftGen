@@ -1,6 +1,3 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeSynonymInstances  #-}
-{-# LANGUAGE FlexibleInstances     #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Minecraft.Format.Block_Internal
@@ -22,21 +19,20 @@ module Minecraft.Format.Block_Internal where
 
 import Data.Int
 
-import Minecraft.Utils.Convertion
+type Blocks  = [Block]
+type Opened  = Bool
+type Pressed = Bool
+type Powered = Bool
+type Counter = Int8
 
-type Blocks        = [Block]
-type Spread        = Int8
-type Counter       = Int8
-type CactusData    = Int8
-type SugarData     = Int8
-type Wetness       = Int8
-type Growth        = Int8
-type TallGrassData = Int8
-type Powered       = Bool
-type Pressed       = Bool
-type Level         = Int8
-type Delay         = Int8
-type Opened        = Bool
+newtype Spread        = Spread        { unSpread     :: Int8 } deriving (Show, Eq)
+newtype CactusData    = CactusData    { unCactusData :: Int8 } deriving (Show, Eq)
+newtype SugarData     = SugarData     { unSugarData  :: Int8 } deriving (Show, Eq)
+newtype Wetness       = Wetness       { unWetness    :: Int8 } deriving (Show, Eq)
+newtype Growth        = Growth        { unGrowth     :: Int8 } deriving (Show, Eq)
+newtype TallGrassData = TallGrassData { unTGData     :: Int8 } deriving (Show, Eq)
+newtype Level         = Level         { unLevel      :: Int8 } deriving (Show, Eq)
+newtype Delay         = Delay         { unDelay      :: Int8 } deriving (Show, Eq)
 
 -- | The minecraft block format
 data Block = Air                     | DeadBush               | WoodenDoor DoorData         | Trapdoor TrapDoorData
@@ -55,7 +51,7 @@ data Block = Air                     | DeadBush               | WoodenDoor DoorD
            | Gravel                  | Bricks                 | StoneButton ButtonData      | StoneBrickStairs Direction
            | GoldOre                 | TNT                    | Snow Level                  | Mycelium
            | IronOre                 | Bookshelf              | Ice                         | LilyPad
-           | CoalOre CoalData        | Moss                   | SnowBlock                   | NetherBrick
+           | CoalOre                 | Moss                   | SnowBlock                   | NetherBrick
            | Wood WoodData           | Obsidian               | Cactus CactusData           | NetherBrickFence
            | Leaves LeavesData       | Torch TorchData        | ClayBlock                   | NetherBrickStairs Direction
            | Sponge                  | Fire Spread            | SugarCane SugarData         | NetherWart Growth
@@ -74,13 +70,6 @@ data Block = Air                     | DeadBush               | WoodenDoor DoorD
            | UnknownBlock Int8            -- ^ The block Id is unknown.
            | BinaryInternal [Int8] [Int8] -- ^ For internal use only!
   deriving (Show, Eq)
-  
--- | Todo define this convertion
-instance Convertion Block Blocks where
-  to (BinaryInternal blocks datas) = [UnknownBlock 0]
-  to _                             = error $ "Expected an Internal node, got a real block instead"
-  
-  from x                    = BinaryInternal [] []
   
 -- | Wood data values
 data WoodData = OakWood
@@ -134,9 +123,8 @@ data SaplingType = OakSapling
   deriving (Show, Eq)
   
 -- | Liquid data values
-data LiquidData = LiquidFull
-                | LiquidFalling
-                | LiquidStep Int8
+data LiquidData = LiquidFull Bool
+                | LiquidStep Int8 Bool
   deriving (Show, Eq)
   
 -- | Direction of a block

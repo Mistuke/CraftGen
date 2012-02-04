@@ -18,6 +18,6 @@ module Minecraft.Utils.Convertion
  (Convertion(..)
  ) where
  
-class Convertion a b | a -> b where 
+class Convertion a b | b -> a where 
   to   :: a -> b
   from :: b -> a
