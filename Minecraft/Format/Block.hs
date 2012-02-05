@@ -621,9 +621,9 @@ instance Convertion Int8 Color where
              10 -> Purple
              11 -> Blue
              12 -> Brown
-             13 -> White
-             14 -> White
-             15 -> White
+             13 -> Green
+             14 -> Red
+             15 -> Black
 
 -- | Convert a Byte to a DoorData
 instance Convertion Int8 DoorData where
