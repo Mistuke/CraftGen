@@ -191,15 +191,17 @@ sumBits x bits = sum' (sort bits ) 0
                  
     
 -- | Convert a Byte to a SaplingData
---   As of Beta 1.5, the data value is split in half. The bottom two bits now determine the type of sapling (and thus the eventual tree type), according to the following table:
---   Value 	Description
---   	0 	Oak Sapling
---   	1 	Spruce Sapling
---   	2 	Birch Sapling
---   	3 	Dropped by Jungle Leaves, but otherwise is oak sapling
---   	4+ 	Same as 3, but never dropped
---   
---   The top two bits function as the counter, as in pre-1.5 builds, though obviously there are only four values available in the remaining bits. Either the counter is incremented more slowly to compensate, or trees might just grow more quickly since the update. 
+--   . As of Beta 1.5, the data value is split in half. 
+--   . The bottom two bits now determine the type of sapling 
+--   . (and thus the eventual tree type), according to the following table:
+--   . Value  Description
+--   . 	0 	  Oak Sapling
+--   . 	1 	  Spruce Sapling
+--   . 	2 	  Birch Sapling
+--   . 	3 	  Dropped by Jungle Leaves, but otherwise is oak sapling
+--   . 	4+ 	  Same as 3, but never dropped
+--   . 
+--   . The top two bits function as the counter, as in pre-1.5 builds, though obviously there are only four values available in the remaining bits. Either the counter is incremented more slowly to compensate, or trees might just grow more quickly since the update. 
 instance Convertion Int8 SaplingData where
     to x = let kind  = case sumBits x [0,1] of
                          0 -> OakSapling
@@ -226,9 +228,9 @@ instance Convertion Int8 SaplingData where
            in byte
                          
 -- | Convert a Byte to a LiquidData
---   0x0 is a full block. Water goes up to 0x7, 
---   Lava goes up to 0x6 (using the steps 0x0, 0x2, 0x4 and 0x6). 
---   If bit 0x8 is set, this liquid is "falling" and only spreads downward. 
+--   . 0x0 is a full block. Water goes up to 0x7, 
+--   . Lava goes up to 0x6 (using the steps 0x0, 0x2, 0x4 and 0x6). 
+--   . If bit 0x8 is set, this liquid is "falling" and only spreads downward. 
 instance Convertion Int8 LiquidData where
     to x = let val  = sumBits x [0..3]
                fall = x `testBit` 7
@@ -248,11 +250,11 @@ instance Convertion Int8 LiquidData where
                                   in if fall then base' `setBit` 7 else base'
 
 -- | Convert a Byte to a WoodData
---   Value 	Description
---  	0 	Oak wood
---  	1 	Pine/Spruce wood
---  	2 	Birch wood
---  	3 	Jungle wood 
+--   . Value 	Description
+--   . 	   0 	Oak wood
+--   . 	   1 	Pine/Spruce wood
+--   . 	   2 	Birch wood
+--   . 	   3 	Jungle wood 
 instance Convertion Int8 WoodData where
     to x = case x of
              0 -> OakWood
@@ -267,43 +269,361 @@ instance Convertion Int8 WoodData where
     from JungleWood = 3
 
 -- | Convert a Byte to a LeavesData
+--   . If bit 0x4 is set, the leaves are permanent and will never decay. 
+--   . This bit is set on player-placed leaf blocks and overrides the meaning of bit 0x8.
+--   . 
+--   . If bit 0x8 is set, the leaves will be checked for decay. 
+--   . The bit will be cleared after the check if the leaves do not decay. 
+--   . The bit will be set again whenever a block adjacent to the leaves is changed.
+--   . Value   Description
+--   .     0 	 Oak leaves
+--   .     1 	 Pine/Spruce leaves
+--   .     2 	 Birch leaves
+--   .     3 	 Jungle leaves 
 instance Convertion Int8 LeavesData where
+    to x = let decay = if x `testBit` 3 then Permanent else Decays
+               check = x `testBit` 7
+           in case x `sumBits` [0..2] of
+                0 -> OakLeaves    decay check
+                1 -> PineLeaves   decay check
+                2 -> BirchLeaves  decay check
+                3 -> JungleLeaves decay check
+                
+    from x = let base  = case unLd x of
+                           Permanent -> 0 `setBit` 3
+                           Decays    -> 0
+                 base' = if unLc x then base `setBit` 7 else base
+             in case x of
+                  OakLeaves{}    -> base'
+                  PineLeaves{}   -> base' `setBit` 0
+                  BirchLeaves{}  -> base' `setBit` 1
+                  JungleLeaves{} -> base' `setBit` 0 `setBit` 1
 
 -- | Convert a Byte to a Direction
+--   . 0x2: Facing north (for ladders and signs, attached to the north side of a block)
+--   . 0x3: Facing south
+--   . 0x4: Facing west
+--   . 0x5: Facing east 
 instance Convertion Int8 Direction where
+    to x = case x of
+             2 -> ToNorth
+             3 -> ToSouth
+             4 -> ToWest
+             5 -> ToEast
+             _ -> error "Invalid Direction. Expected values between 0x2 and 0x5"
+    from ToNorth = 2
+    from ToSouth = 3
+    from ToWest  = 4
+    from ToEast  = 5
+             
 
 -- | Convert a Byte to a RailData
+--   . Regular Minecart rails use values above 0x5 for the corner pieces. 
+--   . For powered rails, 0x8 is a bit flag indicating whether or not it is 
+--   . powered, and the bottom three bits have a valid range of 0x0 to 0x5. 
+--   . 
+--   . 0x0: flat track going north-south 
+--   . 0x1: flat track going west-east 
+--   . 0x2: track ascending to the east 
+--   . 0x3: track ascending to the west 
+--   . 0x4: track ascending to the north 
+--   . 0x5: track ascending to the south 
+--   . Regular minecart tracks can make a circle from four rails: 
+--   . 
+--   . 0x6: northwest corner (connecting east and south) 
+--   . 0x7: northeast corner (connecting west and south) 
+--   . 0x8: southeast corner (connecting west and north) 
+--   . 0x9: southwest corner (connecting east and north)
 instance Convertion Int8 RailData where
+    to x = let powered = x `testBit` 7
+               dat     = case x `sumBits` [0,1,2,3] of
+                           0 -> FlatGoingNorthSouth
+                           1 -> FlatGoingWestEast
+                           2 -> TrackAscendingEast
+                           3 -> TrackAscendingWest
+                           4 -> TrackAscendingNorth
+                           5 -> TrackAscendingSouth
+                           6 -> CornerConnectEastSouth
+                           7 -> CornerConnectWestSouth
+                           8 -> CornerConnectWestNorth
+                           9 -> CornerConnectEastNorth
+                           _ -> error "Invalid Raildata, Expected values between 0x0 and 0x9"
+           in RailData powered dat
+    from (RailData powered dat) = let base = if powered then 0 `setBit` 7 else 0
+                                  in case dat of
+                                       FlatGoingNorthSouth    -> base
+                                       FlatGoingWestEast      -> base `setBit` 0
+                                       TrackAscendingEast     -> base `setBit` 1
+                                       TrackAscendingWest     -> base `setBit` 0 `setBit` 1
+                                       TrackAscendingNorth    -> base `setBit` 2
+                                       TrackAscendingSouth    -> base `setBit` 2 `setBit` 0
+                                       CornerConnectEastSouth -> base `setBit` 2 `setBit` 1
+                                       CornerConnectWestSouth -> base `setBit` 2 `setBit` 1 `setBit` 0
+                                       CornerConnectWestNorth -> base `setBit` 3
+                                       CornerConnectEastNorth -> base `setBit` 3 `setBit` 0
+                                       _ -> error "Invalid nesting of RailData. Expected a direction instead got RailData"
+    from _                      = error "Invalid nesting of the RailData. Expected RailData instead got a direction"
 
 -- | Convert a Byte to a PistonData
+--   . The top bit (0x8) is a status bit that determines whether 
+--   . the piston is pushed out or not. 1 for pushed out, 0 for retracted.
+--   . 
+--   . The bottom three bits are a value from 0 to 5, indicating the 
+--   . direction of the piston (the direction the piston head is pointing)
+--   . 
+--   .     0: Down
+--   .     1: Up
+--   .     2: north
+--   .     3: south
+--   .     4: west
+--   .     5: east 
 instance Convertion Int8 PistonData where
+    to x = let pressed = x `testBit` 7
+               axis = case x `sumBits` [0,1,2] of
+                        0 -> Down
+                        1 -> Up
+                        2 -> North
+                        3 -> South
+                        4 -> West
+                        5 -> East
+           in PistonData pressed axis
+    
+    from (PistonData pressed axis) = let base = if pressed then 0 `setBit` 7 else 0
+                                     in case axis of
+                                          Down  -> base 
+                                          Up    -> base `setBit` 0
+                                          North -> base `setBit` 1
+                                          South -> base `setBit` 1 `setBit` 0
+                                          West  -> base `setBit` 2
+                                          East  -> base `setBit` 2 `setBit` 0
+                
 
 -- | Convert a Byte to a TallGrassData
 instance Convertion Int8 TallGrassData where
 
 -- | Convert a Byte to a BedData
+--   . 0x0: Head is pointing south
+--   . 0x1: Head is pointing west
+--   . 0x2: Head is pointing north
+--   . 0x3: Head is pointing east 
+--   . 
+--   . 0x4: (bit flag) - When 0, the bed is empty. When 1, the bed is occupied.
+--   . 0x8: (bit flag) - When 0, the foot of the bed. When 1, the head of the bed. 
 instance Convertion Int8 BedData where
+    to x = let empty = x `testBit` 3
+               bhead = x `testBit` 7
+               dir   = case x `sumBits` [0,1,2] of
+                         0 -> ToSouth
+                         1 -> ToWest
+                         2 -> ToNorth
+                         3 -> ToEast
+           in BedData dir empty bhead
+       
+    from (BedData dir full bhead) = let base  = if full  then 0 `setBit` 7 else 0
+                                        base' = if bhead then base `setBit` 1 else base  
+                                    in case dir of
+                                         ToSouth -> base'
+                                         ToWest  -> base' `setBit` 0
+                                         ToNorth -> base' `setBit` 1
+                                         ToEast  -> base' `setBit` 0 `setBit` 1
 
 -- | Convert a Byte to a SlabData
+--   . 	Value 	Description
+--   . 	0x0 	Stone Slab
+--   . 	0x1 	Sandstone Slab
+--   . 	0x2 	Wooden Slab
+--   . 	0x3 	Cobblestone Slab
+--   . 	0x4 	Brick Slab
+--   . 	0x5 	Stone Brick Slab
+--   . 	0x6 	Stone Slab 
 instance Convertion Int8 SlabData where
+    to x = case x `sumBits` [0,1,2,3] of
+             0 -> StoneSlab
+             1 -> SandstoneSlab
+             2 -> WoodenSlab
+             3 -> CobblestoneSlab
+             4 -> BrickSlab
+             5 -> StoneBrickSlab
+             6 -> StoneSlab2
+             _ -> error "Invalid Slab data. Range 0..6 expected"
+             
+    from StoneSlab       = 0
+    from SandstoneSlab   = 1
+    from WoodenSlab      = 2
+    from CobblestoneSlab = 3
+    from BrickSlab       = 4
+    from StoneBrickSlab  = 5
+    from StoneSlab2      = 6
+    
+-- | Convert a Byte to a StairsData
+--   . 0x0: Ascending east
+--   . 0x1: Ascending west
+--   . 0x2: Ascending south
+--   . 0x3: Ascending north 
+instance Convertion Int8 StairsData where
+    to x = StairsData $ case x `sumBits` [0,1,2,3] of
+                          0 -> ToEast
+                          1 -> ToWest
+                          2 -> ToSouth
+                          3 -> ToNorth
+                          _ -> error "Invalid Stairs data. Range 0..3 expected"
+                      
+    from (StairsData ToEast ) = 0
+    from (StairsData ToWest ) = 1
+    from (StairsData ToSouth) = 2
+    from (StairsData ToNorth) = 3
+
+-- | Convert a Byte to a PumpKData
+--   . 0x0: Facing south
+--   . 0x1: Facing west
+--   . 0x2: Facing north
+--   . 0x3: Facing east 
+instance Convertion Int8 PumpKData where
+    to x = PumpKData $ case x `sumBits` [0,1,2,3] of
+                         0 -> ToSouth
+                         1 -> ToWest
+                         2 -> ToNorth
+                         3 -> ToEast
+                         _ -> error "Invalid Pumpkin data. Range 0..3 expected"
+    
+    from (PumpKData ToSouth) = 0
+    from (PumpKData ToWest ) = 1
+    from (PumpKData ToNorth) = 2
+    from (PumpKData ToEast ) = 3
 
 -- | Convert a Byte to a Growth
+--   . Nether Wart
+--   . 
+--   . Like Crops, the data value is related to the size of the Nether Wart. There are three distinct visual stages to Nether Wart's growth (the associated values are 0 .. 3)
+--   . 
+--   . Pumpkin stem and Melon stem
+--   . 
+--   . Pumpkin and melon stems grow from 0x0 to 0x7. During each stage of growth a part of their model is revealed. In the last stage a stem can spawn a melon or pumpkin next to it on empty farmland. As long as this fruit remains the stem will appear bent towards the fruit. 
 instance Convertion Int8 Growth where
+    to   = Growth
+    from = unGrowth
 
 -- | Convert a Byte to a TorchData
+--   . 0x1: Pointing east
+--   . 0x2: Pointing west
+--   . 0x3: Pointing south
+--   . 0x4: Pointing north
+--   . 0x5: Standing on the floor 
 instance Convertion Int8 TorchData where
+    to x = case x `sumBits` [0,1,2,3] of
+             1 -> PointEast
+             2 -> PointWest
+             3 -> PointSouth
+             4 -> PointNorth
+             5 -> Standing
+             _ -> error "Invalid Torch data. Range 1..5 expected"
 
 -- | Convert a Byte to a Spread
 instance Convertion Int8 Spread where
+    to   = Spread
+    from = unSpread
 
 -- | Convert a Byte to a Wetness
 instance Convertion Int8 Wetness where
+    to x | x >= 0 && x <= 8 = Wetness x
+    to _                    = error "Invalid wetness value. Range 0..8 expected"
+    
+    from (Wetness x) | x >= 0 && x <= 8 = x
+    from _                              = error "Invalid wetness value. Range 0..8 expected"
 
 -- | Convert a Byte to a SignData
+--   . 0x0: south
+--   . 0x1: south-southwest
+--   . 0x2: southwest
+--   . 0x3: west-southwest
+--   . 0x4: west
+--   . 0x5: west-northwest
+--   . 0x6: northwest
+--   . 0x7: north-northwest
+--   . 0x8: north
+--   . 0x9: north-northeast
+--   . 0xA: northeast
+--   . 0xB: east-northeast
+--   . 0xC: east
+--   . 0xD: east-southeast
+--   . 0xE: southeast
+--   . 0xF: south-southeast 
 instance Convertion Int8 SignData where
+    to x = case x `sumBits` [0,1,2,3] of
+             0  -> PostSouth
+             1  -> PostSouth_SouthWest
+             2  -> PostSouthWest
+             3  -> PostWest_SouthWest
+             4  -> PostWest
+             5  -> PostWest_NorthWest
+             6  -> PostNorthWest
+             7  -> PostNorth_NorthWest
+             8  -> PostNorth
+             9  -> PostNorth_NorthEast
+             10 -> PostNorthEast
+             11 -> PostEast_NorthEast
+             12 -> PostEast
+             13 -> PostEast_SouthEast
+             14 -> PostSouthEast
+             15 -> PostSouth_SouthEast
+             _  -> error "Invalid sign data. Range 0..15 expected"
+             
+    from PostSouth           = 0
+    from PostSouth_SouthWest = 1
+    from PostSouthWest       = 2
+    from PostWest_SouthWest  = 3
+    from PostWest            = 4
+    from PostWest_NorthWest  = 5
+    from PostNorthWest       = 6
+    from PostNorth_NorthWest = 7
+    from PostNorth           = 8
+    from PostNorth_NorthEast = 9
+    from PostNorthEast       = 10
+    from PostEast_NorthEast  = 11
+    from PostEast            = 12
+    from PostEast_SouthEast  = 13
+    from PostSouthEast       = 14
+    from PostSouth_SouthEast = 15
 
 -- | Convert a Byte to a Color
+--   . These values specify the color of the wool. 
+--   . This data is stored in block metadata for placed wool, 
+--   . and as the "damage" for wool in the inventory.
+--   .  Dec   Hex 	Description
+--   . 	0 	  0x0 	Regular wool (white)
+--   . 	1 	  0x1 	Orange
+--   . 	2 	  0x2 	Magenta
+--   . 	3 	  0x3 	Light Blue
+--   . 	4 	  0x4 	Yellow
+--   . 	5 	  0x5 	Lime
+--   . 	6 	  0x6 	Pink
+--   . 	7 	  0x7 	Gray
+--   . 	8 	  0x8 	Light Gray
+--   . 	9 	  0x9 	Cyan
+--   . 	10 	  0xA 	Purple
+--   . 	11 	  0xB 	Blue
+--   . 	12 	  0xC 	Brown
+--   . 	13 	  0xD 	Green
+--   . 	14 	  0xE 	Red
+--   . 	15 	  0xF 	Black 
 instance Convertion Int8 Color where
+    to x = case x `sumBits` [0,1,2,3] where
+             0  -> White
+             1  -> Orange
+             2  -> Magenta
+             3  -> LightBlue
+             4  -> Yellow
+             5  -> Lime
+             6  -> Pink
+             7  -> Gray
+             8  -> LightGray
+             9  -> Cyan
+             10 -> Purple
+             11 -> Blue
+             12 -> Brown
+             13 -> White
+             14 -> White
+             15 -> White
 
 -- | Convert a Byte to a DoorData
 instance Convertion Int8 DoorData where

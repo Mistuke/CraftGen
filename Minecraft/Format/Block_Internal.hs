@@ -24,6 +24,7 @@ type Opened  = Bool
 type Pressed = Bool
 type Powered = Bool
 type Counter = Int8
+type Checked = Bool
 
 newtype Spread        = Spread        { unSpread     :: Int8 } deriving (Show, Eq)
 newtype CactusData    = CactusData    { unCactusData :: Int8 } deriving (Show, Eq)
@@ -34,39 +35,42 @@ newtype TallGrassData = TallGrassData { unTGData     :: Int8 } deriving (Show, E
 newtype Level         = Level         { unLevel      :: Int8 } deriving (Show, Eq)
 newtype Delay         = Delay         { unDelay      :: Int8 } deriving (Show, Eq)
 
+newtype PumpKData     = PumpKData     { unPumpK      :: Direction } deriving (Show, Eq)
+newtype StairsData    = StairsData    { unStairs     :: Direction } deriving (Show, Eq)
+
 -- | The minecraft block format
-data Block = Air                     | DeadBush               | WoodenDoor DoorData         | Trapdoor TrapDoorData
-           | Stone                   | Piston PistonData      | Ladders Direction           | Silverfish SilverFishData
-           | Grass                   | PistonExt PistonData   | Rails RailData              | StoneBricks StoneData
-           | Dirt                    | Wool Color             | CobblestoneStairs Direction | HugeBrownMushroom MushroomData
-           | Cobblestone             | BlockMovedByPiston     | WallSign Direction          | HugeRedMushroom MushroomData
-           | WoodenPlanks            | Dandelion              | Lever LeverData             | IronBars
-           | Saplings SaplingData    | Rose                   | StonePressurePlate Pressed  | GlassPane
-           | Bedrock                 | BrownMushroom          | IronDoor DoorData           | Melon
-           | Water LiquidData        | RedMushroom            | WoodenPressurePlate Pressed | PumpkinStem Growth
-           | StillWater LiquidData   | Gold                   | RedstoneOre                 | MelonStem Growth
-           | Lava LiquidData         | Iron                   | GlowingRedstoneOre          | Vines Direction
-           | StillLava LiquidData    | DoubleSlabs SlabData   | RedstoneTorchOff TorchData  | FenceGate TrapDoorData
-           | Sand                    | Slabs SlabData         | RedstoneTorchOn  TorchData  | BrickStairs Direction
-           | Gravel                  | Bricks                 | StoneButton ButtonData      | StoneBrickStairs Direction
-           | GoldOre                 | TNT                    | Snow Level                  | Mycelium
-           | IronOre                 | Bookshelf              | Ice                         | LilyPad
-           | CoalOre                 | Moss                   | SnowBlock                   | NetherBrick
-           | Wood WoodData           | Obsidian               | Cactus CactusData           | NetherBrickFence
-           | Leaves LeavesData       | Torch TorchData        | ClayBlock                   | NetherBrickStairs Direction
-           | Sponge                  | Fire Spread            | SugarCane SugarData         | NetherWart Growth
-           | Glass                   | MonsterSpawner         | Jukebox JukeboxData         | EnchantmentTable
-           | LapisLazuliOre          | WoodenStairs Direction | Fence                       | BrewingStand BrewingData
-           | LapisLazuliBlock        | Chest Direction        | Pumpkin Direction           | Cauldron CauldronData
-           | Dispenser Direction     | RedstoneWire Spread    | Netherrack                  | EndPortal
-           | Sandstone               | DiamondOre             | SoulSand                    | EndPortalFrame PortalFrameData
-           | NoteBlock               | Diamond                | Glowstone                   | EndStone
-           | Bed BedData             | CraftingTable          | Portal                      | DragonEgg
-           | PoweredRail  RailData   | WheatSeeds Growth      | JackOLantern Direction       
-           | DetectorRail RailData   | Farmland Wetness       | CakeBlock            
-           | StickyPiston PistonData | Furnace Direction      | RedstoneRepeaterOff RepeaterData    
-           | Cobweb                  | BurnFurnace Direction  | RedstoneRepeaterOn  RepeaterData
-           | TallGrass TallGrassData | SignPost SignData      | LockedChest         
+data Block = Air                     | DeadBush                | WoodenDoor DoorData          | Trapdoor TrapDoorData
+           | Stone                   | Piston PistonData       | Ladders Direction            | Silverfish SilverFishData
+           | Grass                   | PistonExt PistonData    | Rails RailData               | StoneBricks StoneData
+           | Dirt                    | Wool Color              | CobblestoneStairs StairsData | HugeBrownMushroom MushroomData
+           | Cobblestone             | BlockMovedByPiston      | WallSign Direction           | HugeRedMushroom MushroomData
+           | WoodenPlanks            | Dandelion               | Lever LeverData              | IronBars
+           | Saplings SaplingData    | Rose                    | StonePressurePlate Pressed   | GlassPane
+           | Bedrock                 | BrownMushroom           | IronDoor DoorData            | Melon
+           | Water LiquidData        | RedMushroom             | WoodenPressurePlate Pressed  | PumpkinStem Growth
+           | StillWater LiquidData   | Gold                    | RedstoneOre                  | MelonStem Growth
+           | Lava LiquidData         | Iron                    | GlowingRedstoneOre           | Vines Direction
+           | StillLava LiquidData    | DoubleSlabs SlabData    | RedstoneTorchOff TorchData   | FenceGate TrapDoorData
+           | Sand                    | Slabs SlabData          | RedstoneTorchOn  TorchData   | BrickStairs StairsData
+           | Gravel                  | Bricks                  | StoneButton ButtonData       | StoneBrickStairs StairsData
+           | GoldOre                 | TNT                     | Snow Level                   | Mycelium
+           | IronOre                 | Bookshelf               | Ice                          | LilyPad
+           | CoalOre                 | Moss                    | SnowBlock                    | NetherBrick
+           | Wood WoodData           | Obsidian                | Cactus CactusData            | NetherBrickFence
+           | Leaves LeavesData       | Torch TorchData         | ClayBlock                    | NetherBrickStairs StairsData
+           | Sponge                  | Fire Spread             | SugarCane SugarData          | NetherWart Growth
+           | Glass                   | MonsterSpawner          | Jukebox JukeboxData          | EnchantmentTable
+           | LapisLazuliOre          | WoodenStairs StairsData | Fence                        | BrewingStand BrewingData
+           | LapisLazuliBlock        | Chest Direction         | Pumpkin PumpKData            | Cauldron CauldronData
+           | Dispenser Direction     | RedstoneWire Spread     | Netherrack                   | EndPortal
+           | Sandstone               | DiamondOre              | SoulSand                     | EndPortalFrame PortalFrameData
+           | NoteBlock               | Diamond                 | Glowstone                    | EndStone
+           | Bed BedData             | CraftingTable           | Portal                       | DragonEgg
+           | PoweredRail  RailData   | WheatSeeds Growth       | JackOLantern PumpKData       
+           | DetectorRail RailData   | Farmland Wetness        | CakeBlock            
+           | StickyPiston PistonData | Furnace Direction       | RedstoneRepeaterOff RepeaterData    
+           | Cobweb                  | BurnFurnace Direction   | RedstoneRepeaterOn  RepeaterData
+           | TallGrass TallGrassData | SignPost SignData       | LockedChest         
            | UnknownBlock Int8            -- ^ The block Id is unknown.
            | BinaryInternal [Int8] [Int8] -- ^ For internal use only!
   deriving (Show, Eq)
@@ -79,14 +83,14 @@ data WoodData = OakWood
   deriving (Show, Eq)
               
 -- | Leaves data values
-data LeavesData = OakLeaves    Decay
-                | PineLeaves   Decay
-                | BirchLeaves  Decay
-                | JungleLeaves Decay
+data LeavesData = OakLeaves    { unLd :: Decay, unLc :: Checked }
+                | PineLeaves   { unLd :: Decay, unLc :: Checked }
+                | BirchLeaves  { unLd :: Decay, unLc :: Checked }
+                | JungleLeaves { unLd :: Decay, unLc :: Checked }
   deriving (Show, Eq)
   
 -- | Indicates if the block decays over time               
-data Decay = Perminant
+data Decay = Permanent
            | Decays
   deriving (Show, Eq)
   
@@ -161,7 +165,8 @@ data BedData = BedData Direction Bool Bool
 --   . 0x7: northeast corner (connecting west and south) 
 --   . 0x8: southeast corner (connecting west and north) 
 --   . 0x9: southwest corner (connecting east and north) 
-data RailData = FlatGoingNorthSouth
+data RailData = RailData Powered RailData
+              | FlatGoingNorthSouth
               | FlatGoingWestEast
               | TrackAscendingEast
               | TrackAscendingWest
