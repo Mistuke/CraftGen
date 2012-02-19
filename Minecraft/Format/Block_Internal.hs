@@ -73,6 +73,7 @@ data Block = Air                     | DeadBush                | WoodenDoor Door
            | TallGrass TallGrassData | SignPost SignData       | LockedChest         
            | UnknownBlock Int8            -- ^ The block Id is unknown.
            | BinaryInternal [Int8] [Int8] -- ^ For internal use only!
+           | UnusedPayload [Int8]         -- ^ For some reason there were too many payloads given
   deriving (Show, Eq)
   
 -- | Wood data values
@@ -271,7 +272,7 @@ data CornerDirection = CornerNorthWest
 --   .      this version didn't power wires around the block it was sitting on. This
 --   .      bug was fixed in Beta 1.6) 
 data LeverData = WallLever Powered Direction
-               | GroundLever Powered Bool Bool
+               | GroundLever Powered Direction
   deriving (Show, Eq)
   
 -- | Button data values
@@ -288,7 +289,7 @@ data TrapDoorData = TrapDoorData Opened Direction
   
 -- | Silver fish data values
 data SilverFishData = SfStone
-                    | SfCobblestone
+                    | SfCobbleStone
                     | SfStoneBrick
   deriving (Show, Eq)
   
@@ -309,7 +310,17 @@ data StoneData = NormalStone | MossyStone | CrackedStone
 --   . 8      Side piece    Cap texture on top and south  
 --   . 9      Corner piece  Cap texture on top, east and south  
 --   . 10     Stem piece    Stem texture on all four sides, pores on top and bottom 
-newtype MushroomData = MushroomData Int8
+data MushroomData = MushroomFleshy
+                  | MushroomCapTopWestNorth
+                  | MushroomCapTopNorth
+                  | MushroomCapTopNorthEast
+                  | MushroomCapTopWest
+                  | MushroomCapTop
+                  | MushroomCapTopEast
+                  | MushroomCapTopSouthWest
+                  | MushroomCapTopSouth
+                  | MushroomCapTopEastSouth
+                  | MushroomStem
   deriving (Show, Eq)
   
 -- | Brewing data values

@@ -21,6 +21,7 @@ module Minecraft.Format.Schematic.Data
   
    -- * utility functions
   , mkMaterial
+  , toMaterial
   ) where
 
 import Data.Int
@@ -45,6 +46,12 @@ mkMaterial :: String -> MaterialMode
 mkMaterial str | str === "classic" = ClassicMode
 mkMaterial str | str === "alpha"   = AlphaMode
 mkMaterial _                       = UnknownMode
+
+-- | Creates a storable version of the material
+toMaterial :: MaterialMode -> String
+toMaterial ClassicMode = "classic"
+toMaterial AlphaMode   = "alpha"
+toMaterial UnknownMode = "unknown"
 
 instance Monoid MaterialMode where
     mempty = UnknownMode

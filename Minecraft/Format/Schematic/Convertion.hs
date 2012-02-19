@@ -18,6 +18,7 @@ module Minecraft.Format.Schematic.Convertion() where
 
 import Minecraft.PrettyPrinting
 import Minecraft.Format.Block_Internal
+import Minecraft.Format.Block()
 import Minecraft.Format.NBT
 import Minecraft.Format.Schematic.Data
 import Minecraft.Utils.Convertion
@@ -61,5 +62,16 @@ createSchematic = toExternal . foldl' create mempty
 
 -- | Convert a schematic to a NBT format
 fromSchematic :: Schematic -> NBT
-fromSchematic = undefined
+fromSchematic schem 
+   = NBT_TAG_Compound (mkName "Schematic")
+       [ NBT_TAG_Short      (mkName "Width"       ) (scmWidth  schem)
+       , NBT_TAG_Short      (mkName "Length"      ) (scmLength schem)
+       , NBT_TAG_Short      (mkName "Height"      ) (scmHeight schem)
+       , NBT_TAG_String     (mkName "Materials"   ) (toMaterial $ scmMaterial schem)
+       , NBT_TAG_Byte_Array (mkName "Blocks"      ) blocks
+       , NBT_TAG_Byte_Array (mkName "Data"        ) datas
+       , NBT_TAG_List       (mkName "Entities"    ) 0 []
+       , NBT_TAG_List       (mkName "TileEntities") 0 []
+       ]
+    where (BinaryInternal blocks datas) = from (scmBlocks schem)
 
