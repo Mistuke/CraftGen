@@ -24,7 +24,8 @@ Build-Depends: ghc         >= 6.12 && < 7.0 || >= 7.0.2,
                zlib        == 0.5.3.1,
                pretty      >= 1.1.0.0,
                bytestring  >= 0.9.1.0,
-               utf8-string >= 0.3.6
+               utf8-string >= 0.3.6,
+                   fclabels    >= 1.1.4  
                
 Extra-Source-Files: Minecraft/*.hs,
                     Minecraft/Format/*.hs,
@@ -66,7 +67,8 @@ Library
                    cereal      >= 0.3.4.0,
                    bytestring  >= 0.9.1.0,
                    utf8-string >= 0.3.6,
-                   zlib        == 0.5.3.1
+                   zlib        == 0.5.3.1,
+                   fclabels    >= 1.1.4  
                      
     Other-Modules:    Paths_CraftGen,
                       Minecraft.Format.Block_Internal
@@ -85,7 +87,8 @@ Executable CraftGen
                    cereal      >= 0.3.4.0,
                    bytestring  >= 0.9.1.0,
                    utf8-string >= 0.3.6,
-                   zlib        == 0.5.3.1   
+                   zlib        == 0.5.3.1,
+                   fclabels    >= 1.1.4                   
     ghc-options:      -fspec-constr-count=16
     Other-Modules:    Paths_CraftGen          
     Default-Language: Haskell98  

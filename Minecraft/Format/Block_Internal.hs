@@ -39,38 +39,38 @@ newtype PumpKData     = PumpKData     { unPumpK      :: Direction } deriving (Sh
 newtype StairsData    = StairsData    { unStairs     :: Direction } deriving (Show, Eq)
 
 -- | The minecraft block format
-data Block = Air                     | DeadBush                | WoodenDoor DoorData              | Trapdoor TrapDoorData          | EmeraldOre
-           | Stone                   | Piston PistonData       | Ladders Direction                | Silverfish SilverFishData      | EnderChest
-           | Grass                   | PistonExt PistonData    | Rails RailData                   | StoneBricks StoneData          | TripwireHook
-           | Dirt                    | Wool Color              | CobblestoneStairs StairsData     | HugeBrownMushroom MushroomData | Tripwire
-           | Cobblestone             | BlockMovedByPiston      | WallSign Direction               | HugeRedMushroom MushroomData   | BlockOfEmerald
-           | WoodenPlanks            | Dandelion               | Lever LeverData                  | IronBars                       | SpruceWoodStairs
-           | Saplings SaplingData    | Rose                    | StonePressurePlate Pressed       | GlassPane                      | BirchWoodStairs
-           | Bedrock                 | BrownMushroom           | IronDoor DoorData                | Melon                          | JungleWoodStairs
-           | Water LiquidData        | RedMushroom             | WoodenPressurePlate Pressed      | PumpkinStem Growth
-           | StillWater LiquidData   | Gold                    | RedstoneOre                      | MelonStem Growth
-           | Lava LiquidData         | Iron                    | GlowingRedstoneOre               | Vines Direction
-           | StillLava LiquidData    | DoubleSlabs SlabData    | RedstoneTorchOff TorchData       | FenceGate TrapDoorData
-           | Sand                    | Slabs SlabData          | RedstoneTorchOn  TorchData       | BrickStairs StairsData
-           | Gravel                  | Bricks                  | StoneButton ButtonData           | StoneBrickStairs StairsData
-           | GoldOre                 | TNT                     | Snow Level                       | Mycelium
-           | IronOre                 | Bookshelf               | Ice                              | LilyPad
-           | CoalOre                 | Moss                    | SnowBlock                        | NetherBrick
-           | Wood WoodData           | Obsidian                | Cactus CactusData                | NetherBrickFence
-           | Leaves LeavesData       | Torch TorchData         | ClayBlock                        | NetherBrickStairs StairsData
-           | Sponge                  | Fire Spread             | SugarCane SugarData              | NetherWart Growth
-           | Glass                   | MonsterSpawner          | Jukebox JukeboxData              | EnchantmentTable
-           | LapisLazuliOre          | WoodenStairs StairsData | Fence                            | BrewingStand BrewingData
-           | LapisLazuliBlock        | Chest Direction         | Pumpkin PumpKData                | Cauldron CauldronData
-           | Dispenser Direction     | RedstoneWire Spread     | Netherrack                       | EndPortal
-           | Sandstone               | DiamondOre              | SoulSand                         | EndPortalFrame PortalFrameData
-           | NoteBlock               | Diamond                 | Glowstone                        | EndStone
-           | Bed BedData             | CraftingTable           | Portal                           | DragonEgg
-           | PoweredRail  RailData   | WheatSeeds Growth       | JackOLantern PumpKData           | RedstoneLambInactive
-           | DetectorRail RailData   | Farmland Wetness        | CakeBlock                        | RedstoneLambActive
-           | StickyPiston PistonData | Furnace Direction       | RedstoneRepeaterOff RepeaterData | WoodenDoubleSlab
-           | Cobweb                  | BurnFurnace Direction   | RedstoneRepeaterOn  RepeaterData | CocaoPlant
-           | TallGrass TallGrassData | SignPost SignData       | LockedChest                      | SandstoneStairs
+data Block = Air                     | DeadBush                  | WoodenDoor DoorData              | Trapdoor TrapDoorData          | SandstoneStairs StairsData
+           | Stone                   | Piston PistonData         | Ladders Direction                | Silverfish SilverFishData      | EmeraldOre
+           | Grass                   | PistonExt PistonData      | Rails RailData                   | StoneBricks StoneData          | EnderChest Direction
+           | Dirt                    | Wool Color                | CobblestoneStairs StairsData     | HugeBrownMushroom MushroomData | TripwireHook TripwireHookData
+           | Cobblestone             | BlockMovedByPiston        | WallSign Direction               | HugeRedMushroom MushroomData   | Tripwire TripwireData
+           | WoodenPlanks            | Dandelion                 | Lever LeverData                  | IronBars                       | BlockOfEmerald
+           | Saplings SaplingData    | Rose                      | StonePressurePlate Pressed       | GlassPane                      | SpruceWoodStairs StairsData
+           | Bedrock                 | BrownMushroom             | IronDoor DoorData                | Melon                          | BirchWoodStairs StairsData
+           | Water LiquidData        | RedMushroom               | WoodenPressurePlate Pressed      | PumpkinStem Growth             | JungleWoodStairs StairsData
+           | StillWater LiquidData   | Gold                      | RedstoneOre                      | MelonStem Growth
+           | Lava LiquidData         | Iron                      | GlowingRedstoneOre               | Vines Direction
+           | StillLava LiquidData    | DoubleSlabs StoneSlabData | RedstoneTorchOff TorchData       | FenceGate TrapDoorData
+           | Sand                    | Slabs StoneSlabData       | RedstoneTorchOn  TorchData       | BrickStairs StairsData
+           | Gravel                  | Bricks                    | StoneButton ButtonData           | StoneBrickStairs StairsData
+           | GoldOre                 | TNT                       | Snow Level                       | Mycelium
+           | IronOre                 | Bookshelf                 | Ice                              | LilyPad
+           | CoalOre                 | Moss                      | SnowBlock                        | NetherBrick
+           | Wood WoodData           | Obsidian                  | Cactus CactusData                | NetherBrickFence
+           | Leaves LeavesData       | Torch TorchData           | ClayBlock                        | NetherBrickStairs StairsData
+           | Sponge                  | Fire Spread               | SugarCane SugarData              | NetherWart Growth
+           | Glass                   | MonsterSpawner            | Jukebox JukeboxData              | EnchantmentTable
+           | LapisLazuliOre          | WoodenStairs StairsData   | Fence                            | BrewingStand BrewingData
+           | LapisLazuliBlock        | Chest Direction           | Pumpkin PumpKData                | Cauldron CauldronData
+           | Dispenser Direction     | RedstoneWire Spread       | Netherrack                       | EndPortal
+           | Sandstone               | DiamondOre                | SoulSand                         | EndPortalFrame PortalFrameData
+           | NoteBlock               | Diamond                   | Glowstone                        | EndStone
+           | Bed BedData             | CraftingTable             | Portal                           | DragonEgg
+           | PoweredRail  RailData   | WheatSeeds Growth         | JackOLantern PumpKData           | RedstoneLampInactive
+           | DetectorRail RailData   | Farmland Wetness          | CakeBlock                        | RedstoneLampActive
+           | StickyPiston PistonData | Furnace Direction         | RedstoneRepeaterOff RepeaterData | WoodenDoubleSlab WoodenSlabData
+           | Cobweb                  | BurnFurnace Direction     | RedstoneRepeaterOn  RepeaterData | WoodenSlab WoodenSlabData
+           | TallGrass TallGrassData | SignPost SignData         | LockedChest                      | CocaoPlant
            | UnknownBlock Int8            -- ^ The block Id is unknown.
            | BinaryInternal [Int8] [Int8] -- ^ For internal use only!
            | UnusedPayload [Int8]         -- ^ For some reason there were too many payloads given
@@ -362,4 +362,24 @@ data CauldronData = CauldronEmpty
 --   . 0x4 is a bit flag: 0 is an "empty" frame block, 1 
 --   . is a block with an Eye of Ender inserted. 
 data PortalFrameData = PortalFrameData Direction Bool
+  deriving (Show, Eq)
+  
+-- | Tripwire Hooks 
+--   . 0x4: This bit means the tripwire hook is connected and ready to trip ("middle" position) 
+--   . 0x8: This bit means the tripwire hook is currently activated ("down" position) 
+--   . An activated hook will normally have a value of 0xC, meaning "connected" and "activated". 
+--   . 
+--   . The two low bits determine to which wall the hook is attached: 
+--   . 
+--   . 0x0: Facing south 
+--   . 0x1: Facing west 
+--   . 0x2: Facing north 
+--   . 0x3: Facing east 
+data TripwireHookData = TripwireHookData Bool Bool Direction
+  deriving (Show, Eq)
+  
+-- | 0x4: This bit means the tripwire as a whole has been activated. 
+--   . 0x1: This bit means some object is on this particular piece of tripwire. 
+--   . So, unactivated tripwire has a value of 0x0. 
+data TripwireData = TripwireData Bool Bool
   deriving (Show, Eq)

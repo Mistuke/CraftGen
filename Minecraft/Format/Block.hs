@@ -172,7 +172,7 @@ fromBlocks (x:xs) = let x' = case x of
                                RedstoneLampActive      -> ([124], [])
                                WoodenDoubleSlab    arg -> ([125], [from arg])
                                WoodenSlab          arg -> ([126], [from arg])
-                               CocoaPlant              -> ([127], [])
+                               CocaoPlant              -> ([127], [])
                                SandstoneStairs     arg -> ([128], [from arg])
                                EmeraldOre              -> ([129], [])
                                EnderChest          arg -> ([130], [from arg])
@@ -314,12 +314,12 @@ mkBlocks (x:xs) payload
                        120 -> lat EndPortalFrame
                        121 -> lit EndStone
                        122 -> lit DragonEgg
-                       123 -> lit RedstoneLambInactive
-                       124 -> lit RedstoneLambActive
+                       123 -> lit RedstoneLampInactive
+                       124 -> lit RedstoneLampActive
                        125 -> lat WoodenDoubleSlab
                        126 -> lat WoodenSlab
-                       127 -> lit CocoaPlant
-                       128 -> lat RedstoneStairs
+                       127 -> lit CocaoPlant
+                       128 -> lat SandstoneStairs
                        129 -> lit EmeraldOre
                        130 -> lat EnderChest
                        131 -> lat TripwireHook
@@ -594,33 +594,61 @@ instance Convertion Int8 BedData where
                                          ToNorth -> base' `setBit` 1
                                          ToEast  -> base' `setBit` 0 `setBit` 1
 
--- | Convert a Byte to a SlabData
+-- | Convert a Byte to a StoneSlabData
 --   . 	Value 	Description
 --   . 	0x0 	Stone Slab
 --   . 	0x1 	Sandstone Slab
---   . 	0x2 	Wooden Slab
+--   . 	0x2 	Wooden Stone Slab
 --   . 	0x3 	Cobblestone Slab
 --   . 	0x4 	Brick Slab
 --   . 	0x5 	Stone Brick Slab
---   . 	0x6 	Stone Slab 
-instance Convertion Int8 SlabData where
-    to x = case x `sumBits` [0..3] of
-             0 -> StoneSlab
-             1 -> SandstoneSlab
-             2 -> WoodenSlab
-             3 -> CobblestoneSlab
-             4 -> BrickSlab
-             5 -> StoneBrickSlab
-             6 -> StoneSlab2
-             _ -> error "Invalid Slab data. Range 0..6 expected"
-             
-    from StoneSlab       = 0
-    from SandstoneSlab   = 1
-    from WoodenSlab      = 2
-    from CobblestoneSlab = 3
-    from BrickSlab       = 4
-    from StoneBrickSlab  = 5
-    from StoneSlab2      = 6
+instance Convertion Int8 StoneSlabData where
+    to x = let enum = case x `sumBits` [0..3] of
+                         0 -> StoneSlab
+                         1 -> SandstoneSlab
+                         2 -> WoodenStoneSlab
+                         3 -> CobblestoneSlab
+                         4 -> BrickSlab
+                         5 -> StoneBrickSlab
+                         _ -> error "Invalid Slab data. Range 0..6 expected"
+            in StoneSlabData enum (x `testBit` 7)
+    
+    from (StoneSlabData slab pressed)
+      = let base = case slab of
+                     StoneSlab       -> 0
+                     SandstoneSlab   -> 1
+                     WoodenStoneSlab -> 2
+                     CobblestoneSlab -> 3
+                     BrickSlab       -> 4
+                     StoneBrickSlab  -> 5
+        in if pressed 
+              then base `setBit` 7
+              else base
+    
+-- | Convert a Byte to a WoodenSlabData
+--   . Icon  Value  Description  
+--   .  0x0  Oak-Wood Slab  
+--   .  0x1  Spruce-Wood Slab  
+--   .  0x2  Birch-Wood Slab  
+--   .  0x3  Jungle-Wood Slab  
+instance Convertion Int8 WoodenSlabData where
+    to x = let enum = case x `sumBits` [0..3] of
+                         0 -> OakWoodSlab   
+                         1 -> SpruceWoodSlab
+                         2 -> BirchWoodSlab 
+                         3 -> JungleWoodSlab
+                         _ -> error "Invalid Slab data. Range 0..6 expected"
+            in WoodenSlabData enum (x `testBit` 7)
+    
+    from (WoodenSlabData slab pressed)
+      = let base = case slab of
+                     OakWoodSlab    -> 0
+                     SpruceWoodSlab -> 1
+                     BirchWoodSlab  -> 2
+                     JungleWoodSlab -> 3
+        in if pressed 
+              then base `setBit` 7
+              else base
     
 -- | Convert a Byte to a StairsData
 --   . 0x0: Ascending east
@@ -1171,3 +1199,42 @@ instance Convertion Int8 PortalFrameData where
                 ToSouth -> base `setBit` 0
                 ToWest  -> base `setBit` 1
                 ToEast  -> base `setBit` 0 `setBit` 1
+
+-- | 0x4: This bit means the tripwire hook is connected and ready to trip ("middle" position) 
+--   . 0x8: This bit means the tripwire hook is currently activated ("down" position) 
+--   . An activated hook will normally have a value of 0xC, meaning "connected" and "activated". 
+--   . 
+--   . The two low bits determine to which wall the hook is attached: 
+--   . 
+--   . 0x0: Facing south 
+--   . 0x1: Facing west 
+--   . 0x2: Facing north 
+--   . 0x3: Facing east 
+instance Convertion Int8 TripwireHookData where
+    to x = let dir = case x `sumBits` [0..2] of
+                       0 -> ToSouth
+                       1 -> ToWest
+                       2 -> ToNorth
+                       3 -> ToEast
+           in TripwireHookData (x `testBit` 3) (x `testBit` 7) dir
+           
+    from (TripwireHookData connected activated dir)
+         = let base  = 0 
+               base1 = if connected then base `setBit` 3 else base
+               base2 = if activated then base1 `setBit` 7 else base1
+           in case dir of
+                ToSouth -> base2
+                ToWest  -> base2 `setBit` 0
+                ToNorth -> base2 `setBit` 1
+                ToEast  -> base2 `setBit` 0 `setBit` 1
+
+-- | 0x4: This bit means the tripwire as a whole has been activated. 
+--   . 0x1: This bit means some object is on this particular piece of tripwire. 
+--   . So, unactivated tripwire has a value of 0x0. 
+--   . 
+--   . Connection is determined by the neighboring tripwire, similar to redstone wiring.
+instance Convertion Int8 TripwireData where
+    to x = TripwireData (x `testBit` 3) (x `testBit` 0)
+    from (TripwireData act obj) 
+         = let base = if act then 0 `setBit` 3 else 0
+           in if obj then base `setBit` 0 else base
