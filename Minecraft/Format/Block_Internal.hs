@@ -203,14 +203,28 @@ data Color = White     | LightGray
            | Gray      | Black
   deriving (Show, Eq)
   
--- | Slab and Double Slab material data values
-data SlabData = StoneSlab
-              | SandstoneSlab
-              | WoodenSlab
-              | CobblestoneSlab
-              | BrickSlab
-              | StoneBrickSlab
-              | StoneSlab2
+-- | Stone Slab and Stone Double Slab material data values
+data StoneSlabEnum = StoneSlab
+                   | SandstoneSlab
+                   | WoodenStoneSlab
+                   | CobblestoneSlab
+                   | BrickSlab
+                   | StoneBrickSlab
+  deriving (Show, Eq)
+  
+-- | Wooden Slab and Wooden Double Slab material data values
+data WoodenSlabEnum = OakWoodSlab
+                    | SpruceWoodSlab
+                    | BirchWoodSlab
+                    | JungleWoodSlab
+  deriving (Show, Eq)
+  
+-- | Generic Stone Slab and Double slab material data values
+data StoneSlabData = StoneSlabData StoneSlabEnum Bool
+  deriving (Show, Eq)
+
+-- | Generic Wooden Slab and Double slab material data values
+data WoodenSlabData = WoodenSlabData WoodenSlabEnum Bool
   deriving (Show, Eq)
 
 -- | Torches and Redstone Torches data values
