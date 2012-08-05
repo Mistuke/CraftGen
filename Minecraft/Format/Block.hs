@@ -29,7 +29,7 @@ import qualified Debug.Trace as D
 
 import Minecraft.Utils.Convertion
   
-import Minecraft.Format.Block_Internal hiding (Block (BinaryInternal))
+import Minecraft.Format.Block_Internal hiding (BinaryInternal)
 import qualified Minecraft.Format.Block_Internal as BL 
 
 -- | Todo define this convertion
