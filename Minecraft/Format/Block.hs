@@ -29,7 +29,7 @@ import qualified Debug.Trace as D
 
 import Minecraft.Utils.Convertion
   
-import Minecraft.Format.Block_Internal hiding (Block (BinaryInternal))
+import Minecraft.Format.Block_Internal hiding (BinaryInternal)
 import qualified Minecraft.Format.Block_Internal as BL 
 
 -- | Todo define this convertion
@@ -168,6 +168,20 @@ fromBlocks (x:xs) = let x' = case x of
                                EndPortalFrame      arg -> ([120], [from arg])
                                EndStone                -> ([121], [])
                                DragonEgg               -> ([122], [])
+                               RedstoneLampInactive    -> ([123], [])
+                               RedstoneLampActive      -> ([124], [])
+                               WoodenDoubleSlab    arg -> ([125], [from arg])
+                               WoodenSlab          arg -> ([126], [from arg])
+                               CocoaPlant              -> ([127], [])
+                               SandstoneStairs     arg -> ([128], [from arg])
+                               EmeraldOre              -> ([129], [])
+                               EnderChest          arg -> ([130], [from arg])
+                               TripwireHook        arg -> ([131], [from arg])
+                               Tripwire            arg -> ([132], [from arg])
+                               BlockOfEmerald          -> ([133], [])
+                               SpruceWoodStairs    arg -> ([134], [from arg])
+                               BirchWoodStairs     arg -> ([135], [from arg])
+                               JungleWoodStairs    arg -> ([136], [from arg])
                     in x' `combine` fromBlocks xs      
     where combine (x1, y1) (x2, y2) = (x1 ++ x2, y1 ++ y2)
 
@@ -300,6 +314,20 @@ mkBlocks (x:xs) payload
                        120 -> lat EndPortalFrame
                        121 -> lit EndStone
                        122 -> lit DragonEgg
+                       123 -> lit RedstoneLambInactive
+                       124 -> lit RedstoneLambActive
+                       125 -> lat WoodenDoubleSlab
+                       126 -> lat WoodenSlab
+                       127 -> lit CocoaPlant
+                       128 -> lat RedstoneStairs
+                       129 -> lit EmeraldOre
+                       130 -> lat EnderChest
+                       131 -> lat TripwireHook
+                       132 -> lat Tripwire
+                       133 -> lit BlockOfEmerald
+                       134 -> lat SpruceWoodStairs
+                       135 -> lat BirchWoodStairs
+                       136 -> lat JungleWoodStairs
                        _   -> error $ "Unrecognized block with Id " ++ show x
                        
         lit y = case payload of
