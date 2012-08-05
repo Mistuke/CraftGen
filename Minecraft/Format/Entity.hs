@@ -24,6 +24,12 @@ import Data.Int
 import Data.Label
 import Prelude hiding ((.), id)
 
+type Entities = [Entity]
+
+-- | The top level entity type
+data Entity = Entity
+    deriving (Eq, Show)
+
 -- | The entity rotation
 data Rotation 
   = Rotation { _yaw   :: Float -- ^ The rotation yaw
@@ -186,8 +192,8 @@ data Vehicle
    = Boat     { _baseVehicle :: BaseEntity }
    | Minecart { _baseVehicle :: BaseEntity             -- ^ Common base for all entities
               , _cartType    :: MinecartType           -- ^ The type of the minecraft catt, want je lijkt het zelf niet te weten.
-              , _cartFurnace :: Maybe MinecraftFurnace -- ^ For carts with a furance there are extra fields
-              , _cartChest   :: Maybe 
+              -- , _cartFurnace :: Maybe MinecraftFurnace -- ^ For carts with a furance there are extra fields
+              -- , _cartChest   :: Maybe 
               }
   deriving (Eq, Show)
  
